@@ -1,0 +1,1 @@
+after install esm, then run nodemon -r esm .\index.js
