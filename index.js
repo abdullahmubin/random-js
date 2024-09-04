@@ -2,8 +2,12 @@ import express from 'express';
 import configure from './controllers/index.js';
 import connectionWithAtlas from './mongoManager.js'
 import 'dotenv/config'
+
+import cors from 'cors'
+
 const port = 3030;
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 const log = (mssg) => console.log(mssg)
