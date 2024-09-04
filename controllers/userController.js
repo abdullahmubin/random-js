@@ -1,6 +1,6 @@
 import express from 'express';
 import models from '../models/index.js';
-import { saveUser } from '../services/userService.js';
+import { saveUser, getAllUsers } from '../services/userService.js';
 const router = express.Router();
 
 const postHandler = async (req, res) => {
@@ -10,9 +10,11 @@ const postHandler = async (req, res) => {
 
 }
 
-const getHaadler = (req, res) => {
-    const q = JSON.stringify(req.query.dfsdf);
-    res.send("hello world " + q)
+const getHaadler = async (req, res) => {
+    // const q = JSON.stringify(req.query.dfsdf);
+    const users = await getAllUsers();
+
+    res.send(users)
 }
 
 router.get('/', getHaadler)
