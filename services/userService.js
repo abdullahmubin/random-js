@@ -1,4 +1,5 @@
 import models from "../models/index.js";
+import { BadRequest, NotFound } from "../utils/customErrors.js";
 
 export const saveUser = async (user) => {
     const model = new models.User({ username: user.username, createdAt: new Date() })
@@ -58,21 +59,21 @@ export const getById = async (id) => {
 export const deleteById = async (id) => {
     const User = models.User;
 
-    try {
-        let model = await User.findById(id);
+    // try {
+    let model = await User.findById(id);
 
-        if (model) {
-            const result = await User.deleteOne({ _id: id });
-            return result;
-        }
-
-        return new Error('User not found by the id' + id)
-    }
-    catch (error) {
-        return new Error('' + error.message)
+    if (model) {
+        const result = await User.deleteOne({ _id: id });
+        return result;
     }
 
+    return new NotFound('User not found by the id' + id)
+    // }
+    // catch (error) {
+    //     return new Error('' + error.message)
+    // }
 
 
 
-}
+
+} 

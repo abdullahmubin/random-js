@@ -11,3 +11,7 @@ export class GeneralError extends Error {
 export class NotFound extends GeneralError {
     getCode() { return 404 }
 }
+
+export class BadRequest extends GeneralError {
+    getCode() { return 400 }
+}
