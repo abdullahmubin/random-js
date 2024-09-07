@@ -5,11 +5,15 @@ import 'dotenv/config'
 
 import cors from 'cors'
 import { handleErrors } from './utils/handleErrors.js';
-
+import { uploadFile } from './utils/index.js'
 const port = 3030;
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads'))
+// GET request to access the photo or file http://localhost:3030/uploads/1725709867714-109407206-Printable Receipt.pdf
+
+
 
 const log = (mssg) => console.log(mssg)
 
