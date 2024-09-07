@@ -4,6 +4,7 @@ import connectionWithAtlas from './mongoManager.js'
 import 'dotenv/config'
 
 import cors from 'cors'
+import { handleErrors } from './utils/handleErrors.js';
 
 const port = 3030;
 const app = express();
@@ -14,6 +15,8 @@ const log = (mssg) => console.log(mssg)
 
 connectionWithAtlas();
 configure(app);
+
+app.use(handleErrors);
 
 app.post('/api/data', async (req, res) => {
     try {

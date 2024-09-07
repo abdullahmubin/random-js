@@ -3,37 +3,49 @@ import models from '../models/index.js';
 import { saveUser, getAllUsers, update, deleteById, getById } from '../services/userService.js';
 const router = express.Router();
 
-const postHandler = async (req, res) => {
-    const body = req.body;
-    const user = await saveUser(body);
-
-    if (user instanceof Error) {
-        res.status(409).send(user.message);
-    }
-    else
+const postHandler = async (req, res, next) => {
+    try {
+        const body = req.body;
+        const user = await saveUser(body);
         res.status(201).send(user._id);
+    } catch (error) {
+        return next(error, req, res)
+    }
+
+
+    // const body = req.body;
+    // const user = await saveUser(body);
+    // if (user instanceof Error) {
+    //     res.status(409).send(user.message);
+    // }
+    // else
+    //     res.status(201).send(user._id);
 
 }
 
 const getHaadler = async (req, res) => {
     // const q = JSON.stringify(req.query.dfsdf);
-    const users = await getAllUsers();
+    try {
+        const users = await getAllUsers();
+        res.status(200).send(users)
+    } catch (error) {
+        return next(error, req, res)
+    }
 
-    res.status(200).send(users)
 }
 
-const deleteHandler = async (req, res) => {
-    const id = req.query.id;
+const deleteHandler = async (req, res, next) => {
+    try {
 
-    const result = await deleteById(id);
-
-    if (result instanceof Error) {
-        const code = result.getCode();
-        res.status(code).send(result.message);
-    }
-    else {
+        const id = req.query.id;
+        await deleteById(id);
         res.status(200).send("User deleted.")
+
+    } catch (error) {
+        return next(error, req, res)
     }
+
+
 
 
 }

@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-import { BadRequest, NotFound } from "../utils/customErrors.js";
+import { BadRequest, NotFound, DuplicateFound } from "../utils/customErrors.js";
 
 export const saveUser = async (user) => {
     const model = new models.User({ username: user.username, createdAt: new Date() })
@@ -11,10 +11,12 @@ export const saveUser = async (user) => {
 
     } catch (error) {
         if (error.code === 11000) {
-            return new Error('Duplicate found.' + error.message)
+            console.log('error');
+            console.log(error)
+            throw new DuplicateFound('Duplicate found.' + error.message)
 
         } else {
-            return new Error('other issue found.' + error.message) // rethrow if it's a different kind of error
+            throw new Error(error.message) // rethrow if it's a different kind of error
         }
     }
 
@@ -41,7 +43,7 @@ export const update = async (user) => {
         return model;
     }
 
-    return null;
+    throw new NotFound('User not found by the id' + id)
 }
 
 export const getById = async (id) => {
@@ -53,27 +55,17 @@ export const getById = async (id) => {
         return model;
     }
 
-    return null;
+    throw new NotFound('User not found by the id' + id)
 }
 
 export const deleteById = async (id) => {
     const User = models.User;
 
-    // try {
     let model = await User.findById(id);
 
     if (model) {
         const result = await User.deleteOne({ _id: id });
         return result;
     }
-
-    return new NotFound('User not found by the id' + id)
-    // }
-    // catch (error) {
-    //     return new Error('' + error.message)
-    // }
-
-
-
 
 } 
