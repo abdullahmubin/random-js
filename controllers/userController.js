@@ -6,7 +6,12 @@ const router = express.Router();
 const postHandler = async (req, res) => {
     const body = req.body;
     const user = await saveUser(body);
-    res.status(201).send(user._id);
+
+    if (user instanceof Error) {
+        res.status(409).send(user.message);
+    }
+    else
+        res.status(201).send(user._id);
 
 }
 
@@ -20,15 +25,16 @@ const getHaadler = async (req, res) => {
 const deleteHandler = async (req, res) => {
     const id = req.query.id;
 
-    // console.log('req');
-    // console.log(req)
+    const result = await deleteById(id);
 
-    if (!id) {
-        res.status(400).send("Id not provided");
+    if (result instanceof Error) {
+        res.status(404).send(result.message);
+    }
+    else {
+        res.status(200).send("User deleted.")
     }
 
-    await deleteById(id);
-    res.status(200).send("User deleted.")
+
 }
 
 const putHandler = async (req, res) => {

@@ -2,8 +2,23 @@ import models from "../models/index.js";
 
 export const saveUser = async (user) => {
     const model = new models.User({ username: user.username, createdAt: new Date() })
-    const saveUser = await model.save();
-    return saveUser;
+
+
+    try {
+        const saveUser = await model.save();
+        return saveUser;
+
+    } catch (error) {
+        if (error.code === 11000) {
+            return new Error('Duplicate found.' + error.message)
+
+        } else {
+            return new Error('other issue found.' + error.message) // rethrow if it's a different kind of error
+        }
+    }
+
+
+
 }
 
 export const getAllUsers = async () => {
@@ -43,7 +58,21 @@ export const getById = async (id) => {
 export const deleteById = async (id) => {
     const User = models.User;
 
-    const result = await User.deleteOne({ _id: id });
+    try {
+        let model = await User.findById(id);
 
-    return result;
+        if (model) {
+            const result = await User.deleteOne({ _id: id });
+            return result;
+        }
+
+        return new Error('User not found by the id' + id)
+    }
+    catch (error) {
+        return new Error('' + error.message)
+    }
+
+
+
+
 }
