@@ -1,6 +1,7 @@
 import express from 'express';
 import models from '../models/index.js';
-import { saveUser, getAllUsers, update, deleteById, getById } from '../services/userService.js';
+import { saveUser, getAllUsers, update, deleteById, getById, registerUser, login } from '../services/userService.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 const postHandler = async (req, res, next) => {
@@ -21,6 +22,28 @@ const postHandler = async (req, res, next) => {
     // else
     //     res.status(201).send(user._id);
 
+}
+
+const registerUserHandler = async (req, res, next) => {
+    try {
+        const body = req.body;
+        const user = await registerUser(body);
+        res.status(201).send(user);
+    } catch (error) {
+        return next(error, req, res)
+    }
+}
+
+const loginUserHandler = async (req, res, next) => {
+    try {
+        const body = req.body;
+        console.log('body');
+        console.log(body)
+        const user = await login({ email: body.email, password: body.password });
+        res.status(201).send(user);
+    } catch (error) {
+        return next(error, req, res)
+    }
 }
 
 const getHaadler = async (req, res) => {
@@ -76,9 +99,11 @@ router.get('/:id', getByQueryHaadler)
 router.post('/', postHandler)
 router.put('/', putHandler);
 router.delete('/', deleteHandler)
+router.post('/register', registerUserHandler)
+router.post('/login', loginUserHandler)
 
 const configure = (app) => {
-    app.use('/users', router)
+    app.use('/users', authenticateToken, router)
 }
 
 export default configure;

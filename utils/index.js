@@ -1,4 +1,6 @@
 import multer from 'multer';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -12,3 +14,16 @@ const storage = multer.diskStorage({
 })
 
 export const uploadFile = multer({ storage: storage })
+
+export const secretKey = crypto.randomBytes(32).toString('hex');
+
+export const generateTokey = (user) => {
+    const payload = {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+        role: user.role
+    }
+
+    return jwt.sign(payload, secretKey, { expiresIn: '1h' });
+}

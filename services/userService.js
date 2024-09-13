@@ -1,5 +1,27 @@
 import models from "../models/index.js";
+import bcrypt from 'bcrypt'
 import { BadRequest, NotFound, DuplicateFound } from "../utils/customErrors.js";
+import { generateTokey } from './../utils/index.js'
+
+const saltRounds = 10;
+
+async function hashPassword(password) {
+    try {
+        const hash = await bcrypt.hash(password, saltRounds);
+        return hash;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function comparePasswords(plainPassword, hashedPassword) {
+    try {
+        const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
+        return isMatch;
+    } catch (err) {
+        throw err;
+    }
+}
 
 export const saveUser = async (user) => {
     const model = new models.User({ username: user.username, createdAt: new Date() })
@@ -68,4 +90,48 @@ export const deleteById = async (id) => {
         return result;
     }
 
-} 
+}
+
+export const registerUser = async (user) => {
+    console.log('user');
+    console.log(user);
+
+    const hashedPassword = await hashPassword(user.password);
+
+    const model = new models.User({
+        username: user.username,
+        email: user.email,
+        password: hashedPassword,
+        role: "customer",
+        createdAt: new Date()
+    })
+
+    const saveData = await model.save();
+
+    return saveData;
+
+}
+
+export const login = async (data) => {
+    console.log('email: ')
+    console.log(data)
+    let { email, password } = data;
+    const existingUser = await models.User.findOne({ email });
+
+    if (!existingUser) {
+        throw new Error("user not found");
+    }
+
+    console.log('existingUser');
+    console.log(existingUser)
+    console.log('password: ' + password)
+    // const isPasswordValid = bcrypt.compare(password, existingUser.password);
+    const match = await comparePasswords(password, existingUser.password);
+
+    if (!match) {
+        throw new Error("Incorrect password.");
+    }
+
+    const token = generateTokey(existingUser);
+    return token;
+}
